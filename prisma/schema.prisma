@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int       @id @default(autoincrement())
+  name       String
+  email      String    @unique
+  password   String
+  address    String
+  createdAt  DateTime  @default(now())
+  role       Role      @default(Customer)
+  isVarified Boolean   @default(false)
+  products   Product[]
+  orders     Order[]
+  reviews    Review[]
+}
+
+model Product {
+  id          Int            @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  quantity    Int            @default(0)
+  sellerId    Int
+  seller      User           @relation(fields: [sellerId], references: [id])
+  images      ProductImage[]
+  videoUrl    String
+  reviews     Review[]
+  Order       Order[]
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  url       String
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+}
+
+model Review {
+  id        Int     @id @default(autoincrement())
+  rating    Int
+  comment   String?
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  userId    Int
+  user      User    @relation(fields: [userId], references: [id])
+}
+
+model Order {
+  id         Int      @id @default(autoincrement())
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id])
+  customerId Int
+  customer   User     @relation(fields: [customerId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  status     Status   @default(INITIATED)
+}
+
+enum Role {
+  Customer
+  Seller
+  Admin
+}
+
+enum Status {
+  INITIATED
+  ORDERED
+  DELIEVERED
+}

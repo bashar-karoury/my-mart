@@ -9,17 +9,27 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@prisma/client": "^6.3.0",
+    "bcrypt": "^5.1.1",
+    "crypt": "^0.0.2",
+    "crypto-js": "^4.2.0",
+    "next": "15.1.6",
+    "nodemailer": "^6.10.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.1.6"
+    "redis": "^4.7.0",
+    "uuid": "^11.0.5",
+    "validator": "^13.12.0",
+    "zod": "^3.24.1"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
-    "@eslint/eslintrc": "^3"
+    "prisma": "^6.3.0",
+    "typescript": "^5"
   }
 }

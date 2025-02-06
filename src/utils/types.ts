@@ -11,7 +11,8 @@ export type User_t = {
   role?: Role;
 };
 export type GetUser_t = {
-  email: string;
+  id?: number;
+  email?: string;
   name?: string;
   password?: string;
   address?: string;

@@ -11,25 +11,6 @@ const authPathes = [
 ];
 
 export async function middleware(request: NextRequest) {
-  // console.log("Runtime environment:", process.env.NEXT_RUNTIME);
-  // const isAuthPath = authPathes.includes(request.nextUrl.pathname);
-
-  // // const user = await getUserFromSession(request);
-  // const user = null;
-  // if (!user) {
-  //   if (isAuthPath) {
-  //     return NextResponse.next();
-  //   }
-  //   if (request.nextUrl.pathname.startsWith("/api/")) {
-  //     return new NextResponse("Not authorized", { status: 401 });
-  //   }
-  //   return NextResponse.redirect(new URL("/login", request.url));
-  // }
-
-  // if (isAuthPath) {
-  //   return NextResponse.redirect(new URL("/dashboard", request.url));
-  // }
-
   return NextResponse.next();
 }
 

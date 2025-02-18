@@ -1,5 +1,4 @@
 import React from "react";
-import { cookies } from "next/headers";
 import { getUserFromSession } from "@/utils/sessions";
 import CustomerDashboard from "@/components/customerDashboard";
 import SellerDashboard from "@/components/sellerDashboard";

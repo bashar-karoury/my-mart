@@ -22,14 +22,23 @@ export async function deleteCacheSession(sessionId: string) {
 }
 
 export async function getUserFromSession() {
-  // const cookie = request.cookies.get("session_id");
-  const cookie = (await cookies()).get("session_id")?.value;
-  if (!cookie) {
-    return null;
+  try {
+    // get session_id from cookies
+    const cookie = (await cookies()).get("session_id")?.value;
+    if (!cookie) {
+      return null;
+    }
+    // get user info from cache
+    const userId = await getCacheSession(cookie);
+
+    // use userId to get user from db
+    // ? should user info also be cached ?
+    const user = await getUser({ id: Number(userId) });
+    return user;
+  } catch (error) {
+    console.error("Failed to get user session:", error);
+    throw error;
   }
-  const userId = await getCacheSession(cookie);
-  const user = await getUser({ id: Number(userId) });
-  return user;
 }
 
 export async function deleteSession() {
@@ -56,7 +65,7 @@ export async function createSession(user_id: string) {
   }
   cookieStore.set("session_id", session_id, {
     httpOnly: true,
-    secure: true,
+    // secure: true,
     sameSite: "lax",
     maxAge: 24 * 60 * 60 * 1000, // 1 day expiration
   });

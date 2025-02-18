@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     const existingUser = await getUser({ email: userInfo.email });
     if (!existingUser) {
       return NextResponse.json(
-        { error: "No with this email exists" },
+        { error: "No user with this email exists" },
         { status: 400 }
       );
     }

@@ -1,5 +1,7 @@
+import { productSchema } from "@/utils/validation";
 import prisma from "./prismaClient";
 import { User_t, GetUser_t } from "@/utils/types";
+import { Product } from "@prisma/client";
 
 export async function addUser(user: User_t) {
   try {
@@ -55,18 +57,15 @@ export async function getProducts(
       ...(priceGte && { price: { gte: priceGte } }),
       ...(priceLte && { price: { lte: priceLte } }),
     };
-    let orderBy = { ["name"]: "asc" };
+    let orderBy: { [key: string]: string } = { ["name"]: "asc" };
 
     let sortedBy = sort;
     if (sort && sort[0] === "-") {
       sortedBy = sort.substring(1);
-      orderBy = { [sortedBy || "name"]: "desc" };
+      orderBy = { [sortedBy]: "desc" };
     } else {
-      orderBy = { [sortedBy || "name"]: "asc" };
+      orderBy = { [sortedBy]: "asc" };
     }
-
-    limit = limit ?? 10;
-    offset = offset ?? 0;
     console.log("limit", limit);
     console.log("offset", offset);
     return await prisma.product.findMany({
@@ -81,7 +80,7 @@ export async function getProducts(
   }
 }
 
-export async function createProduct(productData) {
+export async function createProduct(productData: Product) {
   try {
     return await prisma.product.create({
       data: productData,
@@ -92,10 +91,10 @@ export async function createProduct(productData) {
   }
 }
 
-export async function editProduct(productId, productData) {
+export async function editProduct(productId: number, productData: Product) {
   try {
     return await prisma.product.update({
-      where: { id: Number(productId) },
+      where: { id: productId },
       data: productData,
     });
   } catch (error) {
@@ -104,10 +103,10 @@ export async function editProduct(productId, productData) {
   }
 }
 
-export async function deleteProduct(productId) {
+export async function deleteProduct(productId: number) {
   try {
     return await prisma.product.delete({
-      where: { id: Number(productId) },
+      where: { id: productId },
     });
   } catch (error) {
     console.error("Error deleting product:", error);
@@ -115,10 +114,10 @@ export async function deleteProduct(productId) {
   }
 }
 
-export async function getProduct(id: string) {
+export async function getProduct(productId: number) {
   try {
     const product = await prisma.product.findUnique({
-      where: { id: Number(id) },
+      where: { id: productId },
     });
     return product;
   } catch (error) {

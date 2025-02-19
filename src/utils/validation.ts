@@ -27,3 +27,21 @@ export const userLoginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
 });
+
+export const productSchema = z.object({
+  name: z.string().transform((val) => validator.escape(val)), // Sanitize for SQL,
+  description: z
+    .string()
+    .min(10, { message: "Description must be at least 10 characters long" })
+    .transform((val) => validator.escape(val)), // Sanitize for SQL,
+  price: z.number().positive({ message: "Price must be a positive number" }),
+  quantity: z
+    .number()
+    .int({ message: "Stock must be an integer" })
+    .nonnegative({ message: "Stock cannot be negative" }),
+  sellerId: z.number().int({ message: "Seller ID must be an integer" }),
+  videoUrl: z
+    .string()
+    .url({ message: "Invalid URL format" })
+    .transform((val) => validator.escape(val)), // Sanitize for SQL,
+});

@@ -19,7 +19,12 @@ export async function GET(
     const { id } = await params;
     console.log("id of product", id);
     const product = await getProduct(id);
-    console.log("product:", product);
+    if (!product) {
+      return NextResponse.json(
+        { message: "Product Not Found" },
+        { status: 404 }
+      );
+    }
     return NextResponse.json(product, { status: 200 });
   } catch (error) {
     console.log("error ", error);
@@ -67,7 +72,13 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    await deleteProduct(id);
+    const result = await deleteProduct(id);
+    if (!result) {
+      return NextResponse.json(
+        { message: "Product Not Found" },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({ message: "Product deleted" }, { status: 200 });
   } catch (error) {

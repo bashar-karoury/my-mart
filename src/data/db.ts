@@ -1,7 +1,7 @@
 import { productSchema } from "@/utils/validation";
 import prisma from "./prismaClient";
 import { User_t, GetUser_t } from "@/utils/types";
-import { Product } from "@prisma/client";
+import { Prisma, Product } from "@prisma/client";
 
 export async function addUser(user: User_t) {
   try {
@@ -63,8 +63,10 @@ export async function getProducts(
     if (sort && sort[0] === "-") {
       sortedBy = sort.substring(1);
       orderBy = { [sortedBy]: "desc" };
+      console.log("order desc", orderBy);
     } else {
       orderBy = { [sortedBy]: "asc" };
+      console.log("order asc", orderBy);
     }
     console.log("limit", limit);
     console.log("offset", offset);
@@ -97,20 +99,31 @@ export async function editProduct(productId: number, productData: Product) {
       where: { id: productId },
       data: productData,
     });
-  } catch (error) {
-    console.error("Error editing product:", error);
-    throw error;
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      // The .code property can be accessed in a type-safe manner
+      if (e.code === "P2025") {
+        return null;
+      }
+    }
+    console.error("Error editing product:", e);
+    throw e;
   }
 }
-
 export async function deleteProduct(productId: number) {
   try {
     return await prisma.product.delete({
       where: { id: productId },
     });
-  } catch (error) {
-    console.error("Error deleting product:", error);
-    throw error;
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError) {
+      // The .code property can be accessed in a type-safe manner
+      if (e.code === "P2025") {
+        return null;
+      }
+    }
+    console.error("Error deleting product:", e);
+    throw e;
   }
 }
 

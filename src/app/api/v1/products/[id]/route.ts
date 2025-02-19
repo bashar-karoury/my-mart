@@ -17,8 +17,11 @@ export async function GET(
     }
 
     const { id } = await params;
-    console.log("id of product", id);
-    const product = await getProduct(id);
+    const productId = parseInt(id);
+    if (isNaN(productId)) {
+      return NextResponse.json({ message: "Bad Request" }, { status: 400 });
+    }
+    const product = await getProduct(productId);
     if (!product) {
       return NextResponse.json(
         { message: "Product Not Found" },
@@ -47,8 +50,12 @@ export async function PUT(
     }
 
     const { id } = await params;
+    const productId = parseInt(id);
+    if (isNaN(productId)) {
+      return NextResponse.json({ message: "Bad Request" }, { status: 400 });
+    }
     const productData = await request.json();
-    const updatedProduct = await editProduct(id, productData);
+    const updatedProduct = await editProduct(productId, productData);
 
     return NextResponse.json(updatedProduct, { status: 200 });
   } catch (error) {
@@ -72,7 +79,11 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const result = await deleteProduct(id);
+    const productId = parseInt(id);
+    if (isNaN(productId)) {
+      return NextResponse.json({ message: "Bad Request" }, { status: 400 });
+    }
+    const result = await deleteProduct(productId);
     if (!result) {
       return NextResponse.json(
         { message: "Product Not Found" },

@@ -6,7 +6,7 @@ import { productSchema } from "@/utils/validation";
 export async function GET(request: NextRequest) {
   try {
     const user = await getUserFromSession();
-
+    console.log("user", user);
     if (!user) {
       return NextResponse.json(
         { message: { message: "Not Authorized" } },
@@ -21,11 +21,12 @@ export async function GET(request: NextRequest) {
     const priceGte = parseFloat(searchParams.get("price[gte]") || "");
     const priceLte = parseFloat(searchParams.get("price[lte]") || "");
     const sort = searchParams.get("sort")?.trim();
+    console.log("sort", sort);
     const limit = parseInt(searchParams.get("limit") || "10", 10);
     const offset = parseInt(searchParams.get("offset") || "0", 10);
 
     // Validate and sanitize parameters
-    const validSortFields = ["name", "price"];
+    const validSortFields = ["name", "price", "-name", "-price"];
     const sanitizedSort =
       sort && validSortFields.includes(sort) ? sort : "name";
 
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
     }
 
     const productData = await request.json();
-    const validatedData = productSchema.parse(productData);
+    const validatedData = productSchema.safeParse(productData);
     if (!validatedData.success) {
       console.log("Validation Errors:", validatedData.error.format());
       return NextResponse.json(

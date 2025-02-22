@@ -1,21 +1,17 @@
 "use client";
 import React, { useState } from "react";
-import { userLoginSchema } from "@/utils/validation";
+import { emailSchema } from "@/utils/validation";
 import { ZodFormattedError } from "zod";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 
-const Login: React.FC = () => {
+const ResetPassword: React.FC = () => {
   const [formData, setFormData] = useState({
     email: "",
-    password: "",
   });
 
   const [formErrors, setFormErrors] = useState<ZodFormattedError<any> | null>(
     null
   );
 
-  const router = useRouter();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
@@ -28,7 +24,7 @@ const Login: React.FC = () => {
     e.preventDefault();
     // Handle form submission logic here
     // Validate with Zod
-    const result = userLoginSchema.safeParse(formData);
+    const result = emailSchema.safeParse(formData);
 
     if (!result.success) {
       console.log("Validation Errors:", result.error.format());
@@ -38,7 +34,7 @@ const Login: React.FC = () => {
       console.log("Valid Data:", result.data);
       // Proceed with API request or form submission
       try {
-        const response = await fetch("/api/v1/login", {
+        const response = await fetch("/api/v1/req-forget-password", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -49,7 +45,6 @@ const Login: React.FC = () => {
         if (response.ok) {
           const data = await response.json();
           console.log("Success:", data);
-          router.push("/");
         }
       } catch (error) {
         console.error("Error of POST request:", error);
@@ -60,7 +55,7 @@ const Login: React.FC = () => {
 
   return (
     <div>
-      <h1>Login</h1>
+      <h1>Reset Password</h1>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="email">Email:</label>
@@ -76,27 +71,10 @@ const Login: React.FC = () => {
             <p className="error">{formErrors.email._errors.join(", ")}</p>
           )}
         </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-          {formErrors && formErrors?.password && (
-            <p className="error">{formErrors.password._errors.join(", ")}</p>
-          )}
-        </div>
-        <button type="submit">Login</button>
+        <button type="submit">reset password</button>
       </form>
-      <Link href={"/forget-password"}>
-        forget the password. request reset password.
-      </Link>{" "}
     </div>
   );
 };
 
-export default Login;
+export default ResetPassword;

@@ -13,7 +13,7 @@ redisClient.connect();
 export default async function sendVerificationEmail(userInfo) {
   try {
     const verificationToken = uuidv4();
-    const verificationUrl = `${process.env.BASE_URL}/api/v1/verify-email?token=${verificationToken}`;
+    const verificationUrl = `${process.env.BASE_URL}/api/v1/complete-signup?token=${verificationToken}`;
     await setCache(verificationToken, JSON.stringify(userInfo), 60 * 60); // Token expires in 1 hour
     await send(userInfo.email, verificationUrl);
   } catch (error) {

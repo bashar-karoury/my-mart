@@ -1,12 +1,23 @@
-import { productSchema } from "@/utils/validation";
 import prisma from "./prismaClient";
-import { User_t, GetUser_t } from "@/utils/types";
-import { Prisma, Product } from "@prisma/client";
+import { Prisma, Product, User } from "@prisma/client";
+import { GetUser_t } from "@/utils/types";
 
-export async function addUser(user: User_t) {
+export async function addUser(user: User) {
   try {
     return await prisma.user.create({
       data: user,
+    });
+  } catch (error) {
+    console.error("Error adding user:", error);
+    throw error;
+  }
+}
+
+export async function updateUser(email: string, userInfo: GetUser_t) {
+  try {
+    return await prisma.user.update({
+      where: { email },
+      data: userInfo,
     });
   } catch (error) {
     console.error("Error adding user:", error);

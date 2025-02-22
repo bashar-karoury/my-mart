@@ -45,3 +45,11 @@ export const productSchema = z.object({
     .url({ message: "Invalid URL format" })
     .transform((val) => validator.escape(val)), // Sanitize for SQL,
 });
+export const emailSchema = z.object({
+  email: z.string().email(),
+});
+
+export const passwordScheme = z
+  .string()
+  .min(8, { message: "Password must be at least 8 characters long" })
+  .transform((val) => validator.escape(val)); // Sanitize for SQL,

@@ -1,21 +1,19 @@
 "use client";
 import React, { useState } from "react";
-import { userLoginSchema } from "@/utils/validation";
+import { passwordScheme } from "@/utils/validation";
 import { ZodFormattedError } from "zod";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 
-const Login: React.FC = () => {
+const ResetPassword: React.FC = () => {
   const [formData, setFormData] = useState({
-    email: "",
     password: "",
+    confirmPassword: "",
   });
 
   const [formErrors, setFormErrors] = useState<ZodFormattedError<any> | null>(
     null
   );
+  const [misMatchError, setMisMatchError] = useState(false);
 
-  const router = useRouter();
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
@@ -28,7 +26,7 @@ const Login: React.FC = () => {
     e.preventDefault();
     // Handle form submission logic here
     // Validate with Zod
-    const result = userLoginSchema.safeParse(formData);
+    const result = passwordScheme.safeParse(formData.password);
 
     if (!result.success) {
       console.log("Validation Errors:", result.error.format());
@@ -37,19 +35,24 @@ const Login: React.FC = () => {
     } else {
       console.log("Valid Data:", result.data);
       // Proceed with API request or form submission
+      if (formData.password !== formData.confirmPassword) {
+        setMisMatchError(true);
+      }
+      const urlParams = new URLSearchParams(window.location.search);
+      const resetToken = urlParams.get("token");
+
       try {
-        const response = await fetch("/api/v1/login", {
+        const response = await fetch("/api/v1/reset-password", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(result.data),
+          body: JSON.stringify({ newPassword: result.data, token: resetToken }),
         });
 
         if (response.ok) {
           const data = await response.json();
           console.log("Success:", data);
-          router.push("/");
         }
       } catch (error) {
         console.error("Error of POST request:", error);
@@ -60,22 +63,8 @@ const Login: React.FC = () => {
 
   return (
     <div>
-      <h1>Login</h1>
+      <h1>Reset Password</h1>
       <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-          {formErrors && formErrors?.email && (
-            <p className="error">{formErrors.email._errors.join(", ")}</p>
-          )}
-        </div>
         <div>
           <label htmlFor="password">Password:</label>
           <input
@@ -90,13 +79,22 @@ const Login: React.FC = () => {
             <p className="error">{formErrors.password._errors.join(", ")}</p>
           )}
         </div>
-        <button type="submit">Login</button>
+        <div>
+          <label htmlFor="confirm password">Confirm Password:</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+          />
+          {misMatchError && <p className="error"> passwords dont match</p>}
+        </div>
+        <button type="submit">reset password</button>
       </form>
-      <Link href={"/forget-password"}>
-        forget the password. request reset password.
-      </Link>{" "}
     </div>
   );
 };
 
-export default Login;
+export default ResetPassword;

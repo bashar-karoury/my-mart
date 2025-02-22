@@ -41,7 +41,7 @@ const Signup: React.FC = () => {
       console.log("Valid Data:", result.data);
       // Proceed with API request or form submission
       try {
-        const response = await fetch("/api/v1/signup", {
+        const response = await fetch("/api/v1/init-signup", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCache, deleteCache } from "@/utils/cache";
-import { addUser } from "@/data/db";
+import { addUser, createApprovalRequest } from "@/data/db";
 
 export async function GET(req: NextRequest) {
   try {
@@ -19,16 +19,33 @@ export async function GET(req: NextRequest) {
     }
     console.log("cached value", cachedValue);
     const userToBeSignuped = JSON.parse(cachedValue);
-    const result = await addUser(userToBeSignuped);
-
-    console.log("result of db saving", result);
     // delete verification token from cache
     await deleteCache(token);
 
-    return NextResponse.json(
-      { message: "Signup process initiated successfully" },
-      { status: 200 }
-    );
+    // sumbit admin verify request
+    if (userToBeSignuped.role === "Seller") {
+      const appReq = {
+        email: userToBeSignuped.email,
+        data: JSON.stringify(userToBeSignuped),
+      };
+      const result = await createApprovalRequest(appReq);
+
+      console.log("result of creating approval request", result);
+
+      return NextResponse.json(
+        { message: "approval request created successfully" },
+        { status: 200 }
+      );
+    } else {
+      const result = await addUser(userToBeSignuped);
+
+      console.log("result of db saving", result);
+
+      return NextResponse.json(
+        { message: "Signup process initiated successfully" },
+        { status: 200 }
+      );
+    }
   } catch (error) {
     console.log("error ", error);
     return NextResponse.json({ error }, { status: 500 });

@@ -14,17 +14,18 @@ datasource db {
 }
 
 model User {
-  id         Int       @id @default(autoincrement())
-  name       String
-  email      String    @unique
-  password   String
-  address    String
-  createdAt  DateTime  @default(now())
-  role       Role      @default(Customer)
-  isVarified Boolean   @default(false)
-  products   Product[]
-  orders     Order[]
-  reviews    Review[]
+  id              Int               @id @default(autoincrement())
+  name            String
+  email           String            @unique
+  password        String
+  address         String
+  createdAt       DateTime          @default(now())
+  role            Role              @default(Customer)
+  isVarified      Boolean           @default(false)
+  products        Product[]
+  orders          Order[]
+  reviews         Review[]
+  ApprovalRequest ApprovalRequest[]
 }
 
 model Product {
@@ -69,10 +70,28 @@ model Order {
   status     Status   @default(INITIATED)
 }
 
+model ApprovalRequest {
+  id         Int          @id @default(autoincrement())
+  email      String       @unique // Remove @unique if multiple requests per email are allowed
+  data       Json // Flexible storage for customer-provided data
+  status     RequestState @default(PENDING) // Enum for state management
+  adminId    Int? // Nullable, as no admin is assigned initially
+  approvedBy User?        @relation(fields: [adminId], references: [id]) // Nullable relation
+  createdAt  DateTime     @default(now()) // When the request was created
+  updatedAt  DateTime     @updatedAt // When the request was last updated
+  approvedAt DateTime? // Nullable, as it's only set when approved/rejected
+}
+
 enum Role {
   Customer
   Seller
   Admin
+}
+
+enum RequestState {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum Status {

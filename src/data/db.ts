@@ -1,5 +1,5 @@
 import prisma from "./prismaClient";
-import { Prisma, Product, User } from "@prisma/client";
+import { Prisma, Product, User, ApprovalRequest } from "@prisma/client";
 import { GetUser_t } from "@/utils/types";
 
 export async function addUser(user: User) {
@@ -146,6 +146,57 @@ export async function getProduct(productId: number) {
     return product;
   } catch (error) {
     console.error("Error getting product:", error);
+    throw error;
+  }
+}
+
+export async function createApprovalRequest(request: ApprovalRequest) {
+  try {
+    const result = await prisma.approvalRequest.create({ data: request });
+    return result;
+  } catch (error) {
+    console.error("Error creating approval request:", error);
+    throw error;
+  }
+}
+
+export async function getApprovalRequests(type: string) {
+  let result = null;
+  try {
+    if (type === "all") {
+      result = await prisma.approvalRequest.findMany();
+    } else {
+      result = await prisma.approvalRequest.findMany({
+        where: { status: type },
+      });
+    }
+    return result;
+  } catch (error) {
+    console.error("Error getting approval requests:", error);
+    throw error;
+  }
+}
+export async function updateApprovalRequest(
+  id: number,
+  adminId: number,
+  newStatus: string
+) {
+  try {
+    if (!["APPROVED", "REJECTED"].includes(newStatus)) {
+      throw new Error("newStatus wrong type");
+    }
+
+    let result = await prisma.approvalRequest.update({
+      where: { id },
+      data: { status: newStatus, adminId: adminId },
+    });
+    const newSeller = JSON.parse(result.data);
+    result = await addUser(newSeller);
+
+    console.log("result of db saving", result);
+    return result;
+  } catch (error) {
+    console.error("Error updating approval request:", error);
     throw error;
   }
 }

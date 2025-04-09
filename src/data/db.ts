@@ -190,6 +190,11 @@ export async function updateApprovalRequest(
       where: { id },
       data: { status: newStatus, adminId: adminId },
     });
+    console.log("result of updating approval requests in db", result);
+    console.log(
+      "result's data of updating approval requests in db",
+      result.data
+    );
     const newSeller = JSON.parse(result.data);
     result = await addUser(newSeller);
 

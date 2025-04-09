@@ -26,6 +26,7 @@ model User {
   orders          Order[]
   reviews         Review[]
   ApprovalRequest ApprovalRequest[]
+  stripeAccountId String?
 }
 
 model Product {

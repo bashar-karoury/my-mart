@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCache, deleteCache } from "@/utils/cache";
 import { addUser, createApprovalRequest } from "@/data/db";
+import { createAccount, generateOnboardingLink } from "@/utils/payment";
 
 export async function GET(req: NextRequest) {
   try {
@@ -21,7 +22,12 @@ export async function GET(req: NextRequest) {
     const userToBeSignuped = JSON.parse(cachedValue);
     // delete verification token from cache
     await deleteCache(token);
+    // create stripe account and onboarding link
+    const accountId = await createAccount(userToBeSignuped.email);
+    userToBeSignuped.stripeAccountId = accountId;
 
+    const onBoardingLink = await generateOnboardingLink(accountId);
+    console.log(`OnBoarding Link ${onBoardingLink}`);
     // sumbit admin verify request
     if (userToBeSignuped.role === "Seller") {
       const appReq = {
@@ -32,10 +38,7 @@ export async function GET(req: NextRequest) {
 
       console.log("result of creating approval request", result);
 
-      return NextResponse.json(
-        { message: "approval request created successfully" },
-        { status: 200 }
-      );
+      return NextResponse.redirect(onBoardingLink);
     } else {
       const result = await addUser(userToBeSignuped);
 
